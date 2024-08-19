@@ -74,7 +74,11 @@ trait DetectsChromeVersion
         }
 
         foreach ($commands as $command) {
-            $process = Process::fromShellCommandline($command);
+            if (method_exists('Process', 'fromShellCommandline')) {
+                $process = Process::fromShellCommandline($command);
+            } else {
+                $process = new Process($command);
+            }
 
             $process->run();
 
@@ -105,7 +109,9 @@ trait DetectsChromeVersion
      */
     public static function chromeDriverSlug($operatingSystem, $version = null)
     {
-        $slug = static::$platforms[$operatingSystem]['slug'] ?? null;
+        $slug = isset(static::$platforms[$operatingSystem]['slug'])
+            ? static::$platforms[$operatingSystem]['slug']
+            : null;
 
         if (!is_null($version) && version_compare($version, '115.0', '<')) {
             if ($slug === 'mac-arm64') {

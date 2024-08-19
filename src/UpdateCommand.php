@@ -44,7 +44,7 @@ class UpdateCommand extends Command
      *
      * @var string
      */
-    protected $directory = __DIR__.'/../../../laravel/dusk/bin/';
+    protected $directory = __DIR__.'/../../../uofa/laravel-dusk/bin/';
 
     /**
      * Create a new console command instance.
@@ -131,7 +131,9 @@ class UpdateCommand extends Command
 
         $milestones = $this->resolveChromeVersionsPerMilestone();
 
-        return $milestones['milestones'][$version]['version'] ?? false;
+        return isset($milestones['milestones'][$version]['version'])
+            ? $milestones['milestones'][$version]['version']
+            : false;
     }
 
     /**
@@ -148,7 +150,9 @@ class UpdateCommand extends Command
             true
         );
 
-        return $versions['channels']['Stable']['version'] ?? false;
+        return isset($versions['channels']['Stable']['version'])
+            ? $versions['channels']['Stable']['version']
+            : false;
     }
 
     /**
@@ -200,7 +204,7 @@ class UpdateCommand extends Command
 
         $chromedrivers = $versions['milestones'][$milestone]['downloads']['chromedriver'];
 
-        return collect($chromedrivers)->firstWhere('platform', $slug)['url'];
+        return collect($chromedrivers)->where('platform', $slug)->first()['url'];
     }
 
     /**
@@ -280,7 +284,7 @@ class UpdateCommand extends Command
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, 3);
         curl_setopt($ch, CURLOPT_HTTPGET, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         file_put_contents($archive, curl_exec($ch));
